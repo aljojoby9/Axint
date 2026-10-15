@@ -13,4 +13,6 @@ pub mod sync;
 
 pub use error::BridgeError;
 pub use object::GitOid;
-pub use sync::{clone_repository, export_bookmark, push_bookmark};
+pub use sync::{
+    clone_repository, export_bookmark, normalize_git_url, pull_bookmark, push_bookmark, push_bookmark_opts,
+};

@@ -21,18 +21,89 @@ use crate::object::{commit_body, encode_blob, encode_commit, encode_tree, tree_b
 const CHANGE_PREFIX: &str = "Change-Id:";
 const GIT_PREFIX: &str = "Git-Oid:";
 
-/// Pushes `bookmark` to a Git remote such as `git@github.com:org/repo.git`.
+/// Pushes `bookmark` to a Git remote such as `https://github.com/org/repo.git`.
 ///
 /// # Errors
 ///
 /// Returns an error when `git` is missing, the bookmark has no commits, or the
 /// remote rejects the update.
 pub fn push_bookmark(repo: &Repository, bookmark: &str, url: &str) -> Result<GitOid, BridgeError> {
+    push_bookmark_opts(repo, bookmark, url, false)
+}
+
+/// Pushes `bookmark` to a Git remote with optional force flag.
+///
+/// # Errors
+///
+/// Returns an error when `git` is missing, the bookmark has no commits, or the
+/// remote rejects the update.
+pub fn push_bookmark_opts(
+    repo: &Repository,
+    bookmark: &str,
+    url: &str,
+    force: bool,
+) -> Result<GitOid, BridgeError> {
     let git_dir = bare_dir(repo);
     ensure_bare(&git_dir)?;
     let tip = export_bookmark(repo, bookmark, &git_dir)?;
-    git(&git_dir, &["push", url, &format!("refs/heads/{bookmark}:refs/heads/{bookmark}")])?;
+    let normalized = normalize_git_url(url);
+    let refspec = format!("refs/heads/{bookmark}:refs/heads/{bookmark}");
+    let mut args = vec!["push"];
+    if force {
+        args.push("--force");
+    }
+    args.push(&normalized);
+    args.push(&refspec);
+    git(&git_dir, &args)?;
     Ok(tip)
+}
+
+/// Normalizes Git URLs for GitHub, GitLab, and other Git providers.
+#[must_use]
+pub fn normalize_git_url(url: &str) -> String {
+    let trimmed = url.trim();
+    if (trimmed.starts_with("https://github.com/") || trimmed.starts_with("https://gitlab.com/"))
+        && !trimmed.ends_with(".git")
+    {
+        format!("{trimmed}.git")
+    } else {
+        trimmed.to_owned()
+    }
+}
+
+/// Pulls and merges updates from a Git remote for `bookmark`.
+///
+/// # Errors
+///
+/// Returns an error if the network fetch fails or commits cannot be imported.
+pub fn pull_bookmark(
+    repo: &mut Repository,
+    bookmark: &str,
+    url: &str,
+) -> Result<AxiomHash, BridgeError> {
+    let git_dir = bare_dir(repo);
+    ensure_bare(&git_dir)?;
+    let normalized = normalize_git_url(url);
+    let refspec = format!("refs/heads/{bookmark}:refs/remotes/origin/{bookmark}");
+    git(&git_dir, &["fetch", &normalized, &refspec])?;
+    let remote_ref = git_text(&git_dir, &["rev-parse", &format!("refs/remotes/origin/{bookmark}")])?;
+    let remote_oid = GitOid::from_hex(remote_ref.trim())?;
+
+    let commits = git_text(&git_dir, &["rev-list", "--reverse", &remote_oid.to_hex()])?;
+    let mut map: HashMap<GitOid, AxiomHash> = HashMap::new();
+    let mut last_axiom = AxiomHash::ZERO;
+    for line in commits.lines() {
+        if line.is_empty() {
+            continue;
+        }
+        let oid = GitOid::from_hex(line.trim())?;
+        last_axiom = import_commit(repo, &git_dir, &oid, &map)?;
+        map.insert(oid, last_axiom);
+    }
+    if last_axiom != AxiomHash::ZERO {
+        repo.checkout_commit(&last_axiom)?;
+    }
+    Ok(last_axiom)
 }
 
 /// Clones a Git URL into a new Axiom working tree at `dest`.

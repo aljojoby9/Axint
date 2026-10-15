@@ -4,7 +4,7 @@ use std::io::{self, IsTerminal};
 use std::path::PathBuf;
 use std::time::Duration;
 
-use axiom_git_bridge::{clone_repository, push_bookmark};
+use axiom_git_bridge::{clone_repository, pull_bookmark, push_bookmark_opts};
 use axiom_storage::Repository;
 use axiom_vfs::{watch, DirtyRing};
 use clap::{Parser, Subcommand};
@@ -81,16 +81,26 @@ enum Command {
         #[arg(long, default_value = "user@localhost")]
         email: String,
     },
-    /// Push a bookmark to a Git remote.
+    /// Push a bookmark to a remote (GitHub, GitLab, or any Git remote).
     Push {
-        /// Remote name previously added with `axiom remote add`.
-        #[arg(long, default_value = "origin")]
-        remote: String,
-        /// Bookmark to publish. Defaults to the current bookmark.
-        #[arg(long)]
+        /// Remote name (e.g. `origin`) or a direct Git/GitHub/GitLab URL.
+        #[arg(default_value = "origin")]
+        target: String,
+        /// Bookmark to publish. Defaults to the current active bookmark.
+        bookmark: Option<String>,
+        /// Force push (overwrite remote branch).
+        #[arg(short, long)]
+        force: bool,
+    },
+    /// Pull changes from a remote (GitHub, GitLab, or any Git remote).
+    Pull {
+        /// Remote name (e.g. `origin`) or a direct Git/GitHub/GitLab URL.
+        #[arg(default_value = "origin")]
+        target: String,
+        /// Bookmark to pull. Defaults to the current active bookmark.
         bookmark: Option<String>,
     },
-    /// Manage Git remotes.
+    /// Manage Git remotes (GitHub, GitLab, etc.).
     Remote {
         #[command(subcommand)]
         action: RemoteCommand,
@@ -105,8 +115,15 @@ enum RemoteCommand {
     Add {
         /// Remote name, usually `origin`.
         name: String,
-        /// Git or Axiom URL.
+        /// Git, GitHub, or GitLab URL.
         url: String,
+    },
+    /// List configured remotes.
+    List,
+    /// Remove a configured remote.
+    Remove {
+        /// Remote name to remove.
+        name: String,
     },
 }
 
@@ -168,24 +185,88 @@ fn main() -> eyre::Result<()> {
             clone_repository(&url, &dest, &name, &email)?;
             println!("cloned {url} into {}", dest.display());
         }
-        Command::Push { remote, bookmark } => {
-            let repo = open_here()?;
-            let url = repo
-                .remote_url(&remote)
-                .ok_or_else(|| eyre::eyre!("remote `{remote}` is not configured"))?
-                .to_owned();
+        Command::Push { target, bookmark, force } => {
+            let mut repo = open_here()?;
             let bookmark = match bookmark {
                 Some(name) => name,
                 None => repo.current_bookmark()?,
             };
-            let oid = push_bookmark(&repo, &bookmark, &url)?;
-            println!("pushed {bookmark} to {remote} as {oid}");
+            let (remote_label, url) = if target.starts_with("http://")
+                || target.starts_with("https://")
+                || target.starts_with("git@")
+                || target.starts_with("ssh://")
+                || target.contains("github.com")
+                || target.contains("gitlab.com")
+            {
+                if repo.remote_url("origin").is_none() {
+                    let _ = repo.add_remote("origin", &target);
+                }
+                ("remote", target)
+            } else if let Some(configured_url) = repo.remote_url(&target) {
+                (target.as_str(), configured_url.to_owned())
+            } else {
+                eyre::bail!(
+                    "remote `{target}` is not configured.\n\
+                     Tip: Run `axiom remote add {target} <url>` or supply the GitHub/GitLab URL directly:\n\
+                          `axiom push https://github.com/user/repo`"
+                );
+            };
+
+            println!("exporting and pushing bookmark `{bookmark}` to {url}...");
+            let oid = push_bookmark_opts(&repo, &bookmark, &url, force)?;
+            println!("✓ successfully pushed bookmark `{bookmark}` to {remote_label} as {oid}");
+            if url.contains("github.com") || url.contains("gitlab.com") {
+                let base = url.trim_end_matches(".git");
+                println!("  View remote repository: {base}/tree/{bookmark}");
+            }
+        }
+        Command::Pull { target, bookmark } => {
+            let mut repo = open_here()?;
+            let bookmark = match bookmark {
+                Some(name) => name,
+                None => repo.current_bookmark()?,
+            };
+            let url = if target.starts_with("http://")
+                || target.starts_with("https://")
+                || target.starts_with("git@")
+                || target.starts_with("ssh://")
+                || target.contains("github.com")
+                || target.contains("gitlab.com")
+            {
+                target
+            } else if let Some(configured_url) = repo.remote_url(&target) {
+                configured_url.to_owned()
+            } else {
+                eyre::bail!("remote `{target}` is not configured");
+            };
+            println!("fetching and pulling bookmark `{bookmark}` from {url}...");
+            let head = pull_bookmark(&mut repo, &bookmark, &url)?;
+            println!("✓ successfully pulled bookmark `{bookmark}` (head: {head})");
         }
         Command::Remote { action } => match action {
             RemoteCommand::Add { name, url } => {
                 let mut repo = open_here()?;
                 repo.add_remote(&name, &url)?;
                 println!("remote {name} -> {url}");
+            }
+            RemoteCommand::List => {
+                let repo = open_here()?;
+                let remotes = repo.remotes();
+                if remotes.is_empty() {
+                    println!("no remotes configured");
+                } else {
+                    for (name, config) in remotes {
+                        println!("{name}\t{}", config.url);
+                    }
+                }
+            }
+            RemoteCommand::Remove { name } => {
+                let mut repo = open_here()?;
+                if repo.remove_remote(&name)? {
+                    println!("removed remote {name}");
+                } else {
+                    println!("remote {name} was not found");
+                }
             }
         },
         Command::Watch => {

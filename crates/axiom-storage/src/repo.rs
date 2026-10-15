@@ -212,6 +212,25 @@ impl Repository {
         self.config.remotes.get(name).map(|remote| remote.url.as_str())
     }
 
+    /// Returns all configured remotes.
+    #[must_use]
+    pub fn remotes(&self) -> &BTreeMap<String, RemoteConfig> {
+        &self.config.remotes
+    }
+
+    /// Removes a remote URL.
+    ///
+    /// # Errors
+    ///
+    /// Returns an I/O error when config saving fails.
+    pub fn remove_remote(&mut self, name: &str) -> Result<bool, StorageError> {
+        let removed = self.config.remotes.remove(name).is_some();
+        if removed {
+            self.save_config()?;
+        }
+        Ok(removed)
+    }
+
     /// Current bookmark name from `HEAD`.
     ///
     /// # Errors
