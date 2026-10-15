@@ -10,21 +10,11 @@ use crate::error::NetError;
 
 const HASH_COUNT: usize = 4;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Default)]
 struct Cell {
     count: i32,
     key_xor: [u8; 32],
     checksum: u32,
-}
-
-impl Default for Cell {
-    fn default() -> Self {
-        Self {
-            count: 0,
-            key_xor: [0; 32],
-            checksum: 0,
-        }
-    }
 }
 
 /// Fixed-size set sketch.
@@ -86,10 +76,7 @@ impl Iblt {
     pub fn peel(&self) -> Result<Vec<(AxiomHash, i32)>, NetError> {
         let mut cells = self.cells.clone();
         let mut found = Vec::new();
-        loop {
-            let Some(index) = cells.iter().position(|cell| cell.count == 1 || cell.count == -1) else {
-                break;
-            };
+        while let Some(index) = cells.iter().position(|cell| cell.count == 1 || cell.count == -1) {
             let cell = cells[index];
             if checksum(&cell.key_xor) != cell.checksum {
                 return Err(NetError::NotPeeled);

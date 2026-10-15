@@ -80,7 +80,7 @@ pub fn pack_loose(root: &Path) -> Result<Option<PathBuf>, StorageError> {
     if frames.is_empty() {
         return Ok(None);
     }
-    frames.sort_by(|left, right| left.0.cmp(&right.0));
+    frames.sort_by_key(|left| left.0);
     let packs = root.join(".axiom").join("cas").join("packs");
     fs::create_dir_all(&packs)?;
     let stamp = std::time::SystemTime::now()

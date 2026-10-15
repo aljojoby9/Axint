@@ -738,7 +738,7 @@ impl Repository {
     fn tree_from_leaves(&mut self, leaves: &BTreeMap<String, LeafInput>) -> Result<AxiomHash, StorageError> {
         let mut root = DirBuilder::default();
         for (path, leaf) in leaves {
-            insert_leaf(&mut root, path, leaf.clone())?;
+            insert_leaf(&mut root, path, *leaf)?;
         }
         self.write_dir(&root)
     }

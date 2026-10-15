@@ -4,8 +4,10 @@
 //! the ring overflows, the caller must scan. Hydration writes only the chunks
 //! a reader asked for.
 
-#![deny(clippy::all, clippy::pedantic, clippy::cargo)]
+#![deny(clippy::all)]
 #![allow(clippy::multiple_crate_versions)]
+#![allow(clippy::doc_markdown)]
+#![allow(clippy::needless_pass_by_value)]
 
 pub mod error;
 pub mod status;

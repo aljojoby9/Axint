@@ -6,6 +6,7 @@ members = [
     "crates/axiom-vfs",
     "crates/axiom-net",
     "crates/axiom-git-bridge",
+    "crates/axiom-installer",
 ]
 resolver = "2"
 

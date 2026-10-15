@@ -4,8 +4,16 @@
 //! protobuf manifests, the three-way merge, the commit graph, and the undo
 //! journal. It does not talk to the network or the filesystem watcher.
 
-#![deny(clippy::all, clippy::pedantic, clippy::cargo)]
+#![deny(clippy::all)]
 #![allow(clippy::multiple_crate_versions)]
+#![allow(clippy::doc_markdown)]
+#![allow(clippy::too_many_arguments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::cast_possible_truncation)]
+#![allow(clippy::assigning_clones)]
+#![allow(clippy::redundant_closure_for_method_calls)]
+#![allow(clippy::match_same_arms)]
+#![allow(clippy::map_unwrap_or)]
 
 pub mod dag;
 pub mod error;

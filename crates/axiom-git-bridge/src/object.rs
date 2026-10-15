@@ -96,7 +96,7 @@ pub fn encode_commit(body: &[u8]) -> (GitOid, Vec<u8>) {
 #[must_use]
 pub fn tree_body(entries: &[(u32, String, GitOid)]) -> Vec<u8> {
     let mut ordered = entries.to_vec();
-    ordered.sort_by(|left, right| sort_key(left.0, &left.1).cmp(&sort_key(right.0, &right.1)));
+    ordered.sort_by_key(|left| sort_key(left.0, &left.1));
     let mut body = Vec::new();
     for (mode, name, oid) in ordered {
         let mode_text = format!("{mode:o}");

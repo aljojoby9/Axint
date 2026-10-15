@@ -103,7 +103,7 @@ where
     E: From<std::io::Error>,
 {
     let mut pending = Vec::with_capacity(MAX_SIZE);
-    let mut incoming = [0_u8; 64 * 1024];
+    let mut incoming = vec![0_u8; 64 * 1024];
     loop {
         while pending.len() < MAX_SIZE {
             let read = reader.read(&mut incoming)?;

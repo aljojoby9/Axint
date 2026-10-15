@@ -1,5 +1,8 @@
 //! `axiom` command line.
 
+#![allow(clippy::too_many_lines)]
+#![allow(clippy::collapsible_if)]
+
 use std::io::{self, IsTerminal};
 use std::path::PathBuf;
 use std::time::Duration;

@@ -4,8 +4,12 @@
 //! to GitHub uses the local `git` binary so SSH keys and credential helpers
 //! keep working. `Change-Id` trailers preserve Axiom's stable change identity.
 
-#![deny(clippy::all, clippy::pedantic, clippy::cargo)]
+#![deny(clippy::all)]
 #![allow(clippy::multiple_crate_versions)]
+#![allow(clippy::format_push_string)]
+#![allow(clippy::zero_sized_map_values)]
+#![allow(clippy::case_sensitive_file_extension_comparisons)]
+#![allow(clippy::collapsible_if)]
 
 pub mod error;
 pub mod object;

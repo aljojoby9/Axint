@@ -97,7 +97,7 @@ impl AxiomHash {
     /// Returns the underlying I/O error.
     pub fn hash_reader<R: Read>(reader: &mut R) -> Result<Self, CoreError> {
         let mut hasher = StreamingHasher::new();
-        let mut buffer = [0_u8; STREAM_BUFFER];
+        let mut buffer = vec![0_u8; STREAM_BUFFER];
         loop {
             let read = reader.read(&mut buffer)?;
             if read == 0 {
