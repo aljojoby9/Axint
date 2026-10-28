@@ -1,39 +1,39 @@
 <#
 .SYNOPSIS
-    Axiom VCS Automated Windows Installer Script
+    Axint VCS Automated Windows Installer Script
 .DESCRIPTION
-    Installs axiom.exe to %LOCALAPPDATA%\Programs\Axiom\bin, registers it in the persistent
+    Installs axint.exe to %LOCALAPPDATA%\Programs\Axint\bin, registers it in the persistent
     Windows User PATH, and verifies GitHub CLI (gh) interoperability.
 .EXAMPLE
-    irm https://raw.githubusercontent.com/aljojoby9/Repo-test/main/dist/install.ps1 | iex
+    irm https://raw.githubusercontent.com/aljojoby9/Axint/main/dist/install.ps1 | iex
 #>
 
 $ErrorActionPreference = "Stop"
 
 Write-Host "======================================================================" -ForegroundColor Cyan
-Write-Host "               Axiom VCS Automated Windows Installer                  " -ForegroundColor Cyan
+Write-Host "               Axint VCS Automated Windows Installer                  " -ForegroundColor Cyan
 Write-Host "======================================================================" -ForegroundColor Cyan
 
-$installDir = "$env:LOCALAPPDATA\Programs\Axiom\bin"
+$installDir = "$env:LOCALAPPDATA\Programs\Axint\bin"
 Write-Host ">>> Preparing installation directory: $installDir"
 if (-not (Test-Path $installDir)) {
     New-Item -ItemType Directory -Path $installDir -Force | Out-Null
 }
 
-$localCandidate = Join-Path $PSScriptRoot "axiom.exe"
-$releaseCandidate = Join-Path $PSScriptRoot "..\target\release\axiom.exe"
+$localCandidate = Join-Path $PSScriptRoot "axint.exe"
+$releaseCandidate = Join-Path $PSScriptRoot "..\target\release\axint.exe"
 
 if (Test-Path $localCandidate) {
-    Copy-Item $localCandidate "$installDir\axiom.exe" -Force
-    Write-Host "    [OK] Installed local axiom.exe" -ForegroundColor Green
+    Copy-Item $localCandidate "$installDir\axint.exe" -Force
+    Write-Host "    [OK] Installed local axint.exe" -ForegroundColor Green
 } elseif (Test-Path $releaseCandidate) {
-    Copy-Item $releaseCandidate "$installDir\axiom.exe" -Force
-    Write-Host "    [OK] Installed compiled release axiom.exe" -ForegroundColor Green
+    Copy-Item $releaseCandidate "$installDir\axint.exe" -Force
+    Write-Host "    [OK] Installed compiled release axint.exe" -ForegroundColor Green
 } else {
     Write-Host ">>> Downloading latest binary from GitHub repository..."
-    $downloadUrl = "https://github.com/aljojoby9/Repo-test/raw/main/dist/axiom.exe"
-    Invoke-WebRequest -Uri $downloadUrl -OutFile "$installDir\axiom.exe"
-    Write-Host "    [OK] Downloaded and installed axiom.exe" -ForegroundColor Green
+    $downloadUrl = "https://github.com/aljojoby9/Axint/raw/main/dist/axint.exe"
+    Invoke-WebRequest -Uri $downloadUrl -OutFile "$installDir\axint.exe"
+    Write-Host "    [OK] Downloaded and installed axint.exe" -ForegroundColor Green
 }
 
 # Update User PATH
@@ -52,15 +52,15 @@ $env:PATH = "$installDir;$env:PATH"
 # Ecosystem Check
 Write-Host "`n>>> Ecosystem Check:"
 if (Get-Command gh -ErrorAction SilentlyContinue) {
-    Write-Host "    [OK] GitHub CLI (gh) detected! Ready to run side-by-side with Axiom." -ForegroundColor Green
+    Write-Host "    [OK] GitHub CLI (gh) detected! Ready to run side-by-side with Axint." -ForegroundColor Green
 } else {
     Write-Host "    [INFO] GitHub CLI not found. Install with: winget install GitHub.cli" -ForegroundColor Yellow
 }
 
 Write-Host "`n>>> Verification:"
-& "$installDir\axiom.exe" --version
+& "$installDir\axint.exe" --version
 
 Write-Host "`n======================================================================" -ForegroundColor Cyan
-Write-Host "[SUCCESS] Axiom VCS is ready to use!" -ForegroundColor Green
-Write-Host "Type 'axiom --help' in your terminal." -ForegroundColor Green
+Write-Host "[SUCCESS] Axint VCS is ready to use!" -ForegroundColor Green
+Write-Host "Type 'axint --help' in your terminal." -ForegroundColor Green
 Write-Host "======================================================================" -ForegroundColor Cyan

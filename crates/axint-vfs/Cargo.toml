@@ -1,0 +1,24 @@
+[package]
+name = "axint-vfs"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+description = "Event-driven filesystem watcher, delta status, and on-demand file hydration."
+
+[dependencies]
+axint-core.workspace = true
+notify.workspace = true
+parking_lot.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

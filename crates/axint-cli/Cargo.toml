@@ -1,0 +1,30 @@
+[package]
+name = "axint-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+description = "Axint command line: init, commit, merge, undo, and publish to Git remotes including GitHub."
+
+[[bin]]
+name = "axint"
+path = "src/main.rs"
+
+[dependencies]
+axint-core.workspace = true
+axint-storage.workspace = true
+axint-vfs.workspace = true
+axint-git-bridge.workspace = true
+clap.workspace = true
+color-eyre.workspace = true
+eyre.workspace = true
+crossterm.workspace = true
+ratatui.workspace = true
+
+[lints]
+workspace = true

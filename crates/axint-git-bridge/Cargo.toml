@@ -1,0 +1,27 @@
+[package]
+name = "axint-git-bridge"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+description = "Bidirectional Git object bridge so Axint repositories can clone from and push to GitHub."
+
+[dependencies]
+axint-core.workspace = true
+axint-storage.workspace = true
+ed25519-dalek.workspace = true
+flate2.workspace = true
+sha1.workspace = true
+thiserror.workspace = true
+uuid.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

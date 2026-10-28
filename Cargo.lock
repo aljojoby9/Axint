@@ -107,13 +107,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2032f911046de80f0a198e0901378627c33f59ea0ac00e363d481118bd70a53"
 
 [[package]]
-name = "axiom-cli"
+name = "axint-cli"
 version = "0.1.0"
 dependencies = [
- "axiom-core",
- "axiom-git-bridge",
- "axiom-storage",
- "axiom-vfs",
+ "axint-core",
+ "axint-git-bridge",
+ "axint-storage",
+ "axint-vfs",
  "clap",
  "color-eyre",
  "crossterm",
@@ -122,7 +122,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "axiom-core"
+name = "axint-core"
 version = "0.1.0"
 dependencies = [
  "blake3",
@@ -142,11 +142,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "axiom-git-bridge"
+name = "axint-git-bridge"
 version = "0.1.0"
 dependencies = [
- "axiom-core",
- "axiom-storage",
+ "axint-core",
+ "axint-storage",
  "ed25519-dalek",
  "flate2",
  "sha1",
@@ -156,22 +156,22 @@ dependencies = [
 ]
 
 [[package]]
-name = "axiom-installer"
+name = "axint-installer"
 version = "0.1.0"
 
 [[package]]
-name = "axiom-net"
+name = "axint-net"
 version = "0.1.0"
 dependencies = [
- "axiom-core",
+ "axint-core",
  "thiserror",
 ]
 
 [[package]]
-name = "axiom-storage"
+name = "axint-storage"
 version = "0.1.0"
 dependencies = [
- "axiom-core",
+ "axint-core",
  "crc32c",
  "ed25519-dalek",
  "prost",
@@ -185,10 +185,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "axiom-vfs"
+name = "axint-vfs"
 version = "0.1.0"
 dependencies = [
- "axiom-core",
+ "axint-core",
  "notify",
  "parking_lot",
  "tempfile",

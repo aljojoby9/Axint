@@ -1,32 +1,32 @@
 [workspace]
 members = [
-    "crates/axiom-cli",
-    "crates/axiom-core",
-    "crates/axiom-storage",
-    "crates/axiom-vfs",
-    "crates/axiom-net",
-    "crates/axiom-git-bridge",
-    "crates/axiom-installer",
+    "crates/axint-cli",
+    "crates/axint-core",
+    "crates/axint-storage",
+    "crates/axint-vfs",
+    "crates/axint-net",
+    "crates/axint-git-bridge",
+    "crates/axint-installer",
 ]
 resolver = "2"
 
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
-authors = ["Axiom Systems Engineering Team"]
+authors = ["Axint Systems Engineering Team"]
 license = "Apache-2.0 OR MIT"
-repository = "https://github.com/axiom-vcs/axiom"
-homepage = "https://axiom-vcs.dev"
-readme = "SYSTEM_DESIGN.md"
+repository = "https://github.com/aljojoby9/Axint"
+homepage = "https://github.com/aljojoby9/Axint"
+readme = "README.md"
 keywords = ["vcs", "merkle", "cas"]
 categories = ["command-line-utilities", "development-tools"]
 
 [workspace.dependencies]
-axiom-core = { path = "crates/axiom-core" }
-axiom-storage = { path = "crates/axiom-storage" }
-axiom-vfs = { path = "crates/axiom-vfs" }
-axiom-net = { path = "crates/axiom-net" }
-axiom-git-bridge = { path = "crates/axiom-git-bridge" }
+axint-core = { path = "crates/axint-core" }
+axint-storage = { path = "crates/axint-storage" }
+axint-vfs = { path = "crates/axint-vfs" }
+axint-net = { path = "crates/axint-net" }
+axint-git-bridge = { path = "crates/axint-git-bridge" }
 
 blake3 = { version = "1.5", features = ["rayon", "mmap"] }
 zstd = "0.13"

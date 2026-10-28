@@ -1,10 +1,10 @@
-# Axiom VCS
+# Axint VCS
 
-[![Axiom VCS](https://img.shields.io/badge/Axiom-VCS-blue.svg)](https://github.com/aljojoby9/Repo-test)
+[![Axint VCS](https://img.shields.io/badge/Axint-VCS-blue.svg)](https://github.com/aljojoby9/Axint)
 [![Rust 2024](https://img.shields.io/badge/Rust-2024_Edition-orange.svg)](https://www.rust-lang.org/)
 [![License: MIT OR Apache-2.0](https://img.shields.io/badge/License-MIT%20OR%20Apache--2.0-green.svg)](Cargo.toml)
 
-**Axiom VCS** is an industry-grade, ultra-high-performance, memory-safe alternative to Git. Built from first principles in systems-level Rust, Axiom delivers sub-millisecond repository operations, zero-lock Multi-Version Concurrency Control (MVCC), native Content-Defined Chunking (`FastCDC`), and seamless bidirectional compatibility with GitHub and GitLab.
+**Axint VCS** is an industry-grade, ultra-high-performance, memory-safe alternative to Git. Built from first principles in systems-level Rust, Axint delivers sub-millisecond repository operations, zero-lock Multi-Version Concurrency Control (MVCC), native Content-Defined Chunking (`FastCDC`), and seamless bidirectional compatibility with GitHub and GitLab.
 
 ---
 
@@ -14,8 +14,8 @@
 * **Unified Binary & Source Deduplication:** Uses **FastCDC (gear-hashing)** and **Zstandard** compression. Mutated multi-gigabyte binary assets achieve **$> 88\%$ disk space savings** without needing Git-LFS.
 * **BLAKE3 SIMD Tree Hashing:** Hashing speeds exceed **$\ge 6.5\text{ GB/s}$ per core**, saturating PCIe 4.0 NVMe storage while maintaining cryptographic integrity.
 * **Lock-Free ACID Persistence:** Powered by memory-mapped `redb` B+Tree tables. Zero `.lock` file contention during parallel builds, IDE indexing, or background sync.
-* **Instant Non-Destructive Undo:** Every repository mutation is recorded in an append-only operation log (`oplog`), allowing atomic `< 2.0\text{ ms}` rollbacks with `axiom undo` and `axiom redo`.
-* **First-Class GitHub & GitLab Compatibility:** Push and pull directly to GitHub, GitLab, and standard Git remotes with `axiom push` and `axiom pull`.
+* **Instant Non-Destructive Undo:** Every repository mutation is recorded in an append-only operation log (`oplog`), allowing atomic `< 2.0\text{ ms}` rollbacks with `axint undo` and `axint redo`.
+* **First-Class GitHub & GitLab Compatibility:** Push and pull directly to GitHub, GitLab, and standard Git remotes with `axint push` and `axint pull`.
 
 ---
 
@@ -23,10 +23,10 @@
 
 ```
 +-----------------------------------------------------------------------------------+
-|                                 AXIOM CLI / TUI                                   |
+|                                 AXINT CLI / TUI                                   |
 |                    (Rust 2024 Edition, Clap v4, Crossterm, Ratatui)               |
 +-----------------------------------------------------------------------------------+
-|                         AXIOM CORE RUNTIME (libaxiom_core)                        |
+|                         AXINT CORE RUNTIME (libaxint_core)                        |
 |                                                                                   |
 |  +------------------------+  +------------------------+  +---------------------+  |
 |  |     DAG & Evolution    |  |     Merge Engine       |  |     Operation Log   |  |
@@ -37,23 +37,23 @@
 |  | (Chunk size: 16KB-64KB)|  | (BLAKE3 SIMD / AVX-512)|  |   (Zstandard zstd)  |  |
 |  +------------------------+  +------------------------+  +---------------------+  |
 +-----------------------------------------------------------------------------------+
-|                      STORAGE & METADATA ENGINE (libaxiom_storage)                 |
+|                      STORAGE & METADATA ENGINE (libaxint_storage)                 |
 |                                                                                   |
 |  +-------------------------------------+  +------------------------------------+  |
 |  |  Metadata DB: redb / LMDB (Mmap)    |  | Content-Addressable Storage (CAS)  |  |
 |  |  (Lock-free MVCC, B+Tree, Zero-Copy)|  | (Segmented Object Store, FlatPacks)|  |
 |  +-------------------------------------+  +------------------------------------+  |
 +-----------------------------------------------------------------------------------+
-|                      VIRTUAL FILESYSTEM & KERNEL SYNC (libaxiom_vfs)              |
+|                      VIRTUAL FILESYSTEM & KERNEL SYNC (libaxint_vfs)              |
 |                                                                                   |
 |  +-------------------------------------+  +------------------------------------+  |
 |  | Windows: ProjFS / USN Journal       |  | Linux/macOS: FUSE / inotify        |  |
 |  +-------------------------------------+  +------------------------------------+  |
 +-----------------------------------------------------------------------------------+
-|                        GIT COMPATIBILITY & NETWORK (libaxiom_net)                 |
+|                        GIT COMPATIBILITY & NETWORK (libaxint_net)                 |
 |                                                                                   |
 |  +-------------------------------------+  +------------------------------------+  |
-|  |  axiom-git-bridge (GitHub & GitLab) |  |  gRPC over HTTP/3 (QUIC via Quinn) |  |
+|  |  axint-git-bridge (GitHub & GitLab) |  |  gRPC over HTTP/3 (QUIC via Quinn) |  |
 |  +-------------------------------------+  +------------------------------------+  |
 +-----------------------------------------------------------------------------------+
 ```
@@ -64,46 +64,46 @@
 
 ### 1. Initialize a Repository
 ```powershell
-axiom init . --name "Your Name" --email "your@email.com"
+axint init . --name "Your Name" --email "your@email.com"
 ```
 
 ### 2. Inspect Status & Record Commits
 ```powershell
-axiom status
-axiom commit -m "feat: Initial commit"
+axint status
+axint commit -m "feat: Initial commit"
 ```
 
 ### 3. Time-Travel Undo & Redo
 ```powershell
 # Instantly roll back the last operation
-axiom undo
+axint undo
 
 # Reapply the undone state
-axiom redo
+axint redo
 ```
 
 ### 4. Branching & Merging (Bookmarks)
 ```powershell
 # Create a new bookmark (branch)
-axiom bookmark feature-branch
+axint bookmark feature-branch
 
 # Switch active bookmark
-axiom switch main
+axint switch main
 
 # Algebraic 3-way merge
-axiom merge feature-branch
+axint merge feature-branch
 ```
 
 ### 5. Push to GitHub & GitLab
 ```powershell
 # Set up remote
-axiom remote add origin https://github.com/aljojoby9/Repo-test
+axint remote add origin https://github.com/aljojoby9/Axint
 
 # Push active bookmark directly to GitHub
-axiom push
+axint push
 
 # Or push directly to any URL
-axiom push https://github.com/aljojoby9/Repo-test
+axint push https://github.com/aljojoby9/Axint
 ```
 
 ---

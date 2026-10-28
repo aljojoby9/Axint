@@ -1,0 +1,19 @@
+[package]
+name = "axint-net"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+description = "Invertible Bloom lookup tables for Axint set reconciliation."
+
+[dependencies]
+axint-core.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

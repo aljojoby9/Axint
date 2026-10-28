@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package axint.core;
+
+// Canonical wire schema for Axint Merkle objects.
+// The Rust types in `axint-core` encode these messages with prost.
+
+enum EntryType {
+  FILE = 0;
+  DIRECTORY = 1;
+  SYMLINK = 2;
+  EXECUTABLE = 3;
+  CONFLICT = 4;
+}
+
+message TreeEntry {
+  string name = 1;
+  EntryType entry_type = 2;
+  bytes blake3_hash = 3;
+  uint64 size = 4;
+  uint32 permissions = 5;
+}
+
+message TreeManifest {
+  uint32 schema_version = 1;
+  repeated TreeEntry entries = 2;
+}
+
+message ChunkReference {
+  bytes chunk_blake3 = 1;
+  uint32 compressed_size = 2;
+  uint32 uncompressed_size = 3;
+}
+
+message FileManifest {
+  uint64 total_size = 1;
+  bytes aggregate_blake3 = 2;
+  repeated ChunkReference chunks = 3;
+}
+
+message Signature {
+  string name = 1;
+  string email = 2;
+  int64 timestamp_seconds = 3;
+  int32 timezone_offset_minutes = 4;
+  bytes ed25519_signature = 5;
+  bytes public_key = 6;
+}
+
+message CommitManifest {
+  bytes commit_id = 1;
+  bytes root_tree_hash = 2;
+  repeated bytes parent_ids = 3;
+  string change_id = 4;
+  uint64 sequence_number = 5;
+  Signature author = 6;
+  Signature committer = 7;
+  string message = 8;
+  repeated bytes conflict_records = 9;
+}
+
+enum ConflictKind {
+  CONTENT = 0;
+  FILE_DIRECTORY = 1;
+  DELETE_MODIFY = 2;
+  MODE_PERMISSION = 3;
+  MERGE_SET = 4;
+}
+
+message SpanConflict {
+  uint64 ancestor_start = 1;
+  uint64 ancestor_end = 2;
+  uint64 left_start = 3;
+  uint64 left_end = 4;
+  uint64 right_start = 5;
+  uint64 right_end = 6;
+}
+
+message ConflictManifest {
+  uint32 schema_version = 1;
+  bytes ancestor = 2;
+  repeated bytes sides = 3;
+  ConflictKind kind = 4;
+  string path = 5;
+  repeated SpanConflict spans = 6;
+  repeated bytes nested = 7;
+  uint32 left_mode = 8;
+  uint32 right_mode = 9;
+  uint32 ancestor_mode = 10;
+}
